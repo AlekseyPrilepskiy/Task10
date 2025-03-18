@@ -5,38 +5,55 @@ using UnityEngine;
 
 public class Spawner : MonoBehaviour
 {
+    [SerializeField] private List<Cube> _cubes;
+
     private int _minimalCount = 2;
     private int _maximalCount = 6;
-    private int _minimalChance = 0;
-    private int _maximalChance = 100;
 
-    public event Action<Cube> Spawned;
+    public event Action<List<Cube>> Spawned;
 
     private void OnEnable()
     {
-        Cube.BlownUp += Spawn;
+        foreach (Cube cube in _cubes)
+        {
+            if (cube != null)
+            {
+                cube.BlownUp += Spawn;
+            }
+        }
     }
 
     private void OnDisable()
     {
-        Cube.BlownUp -= Spawn;
-    }
-
-    public void Spawn(Cube cube, float chanceToSplit)
-    {
-        if (chanceToSplit >= GetRandomValue(_minimalChance, _maximalChance + 1))
+        foreach (Cube cube in _cubes)
         {
-            for (int i = 0; i < GetRandomValue(_minimalCount, _maximalCount + 1); i++)
+            if (cube != null)
             {
-                Vector3 position = new Vector3(cube.transform.position.x + GetRandomValue(-1, 1), 1, cube.transform.position.z + GetRandomValue(-1, 1));
-
-                Cube newCube = Instantiate(cube);
-
-                newCube.transform.position = position;
-                newCube.Decrease();
-                Spawned?.Invoke(newCube);
+                cube.BlownUp -= Spawn;
             }
         }
+    }
+
+    public void Spawn(Cube cube)
+    {
+        List<Cube> spawnedCubes = new List<Cube>();
+
+        for (int i = 0; i < GetRandomValue(_minimalCount, _maximalCount + 1); i++)
+        {
+            Vector3 position = new Vector3(cube.transform.position.x + GetRandomValue(-1, 1), 1, cube.transform.position.z + GetRandomValue(-1, 1));
+
+            Cube newCube = Instantiate(cube);
+
+            newCube.transform.position = position;
+            newCube.Decrease();
+            newCube.Recolor();
+            newCube.BlownUp += Spawn;
+
+            spawnedCubes.Add(newCube);
+        }
+
+        Spawned?.Invoke(spawnedCubes);
+        _cubes.AddRange(spawnedCubes);
     }
 
     private int GetRandomValue(int min, int max)

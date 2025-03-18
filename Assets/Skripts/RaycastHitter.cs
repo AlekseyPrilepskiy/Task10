@@ -8,10 +8,6 @@ public class RaycastHitter : MonoBehaviour
     [SerializeField] private float _rayLength = 15f;
     [SerializeField] private InputReader _inputReader;
 
-    private string _targetTag = "Cube";
-
-    public event Action<Cube> TargetHitted;
-
     private void OnEnable()
     {
         _inputReader.MouseButtonPressed += Hit;
@@ -29,12 +25,11 @@ public class RaycastHitter : MonoBehaviour
 
         if (Physics.Raycast(ray, out hit, _rayLength))
         {
-            Cube cube = hit.collider.GetComponent<Cube>();
+            IDamageable damage = hit.collider.GetComponent<IDamageable>();
 
-            if (hit.collider.CompareTag(_targetTag))
+            if (damage != null)
             {
-                TargetHitted?.Invoke(cube);
-                Debug.Log("Оно попало.");
+                damage.TakeDamage();
             }
         }
     }

@@ -3,54 +3,48 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
+using Random = UnityEngine.Random;
 
-public class Cube : MonoBehaviour
+public class Cube : MonoBehaviour, IDamageable
 {
-    [SerializeField] private RaycastHitter _raycastHitter;
     [SerializeField] private float _chanceToSplit = 100f;
-    [SerializeField] private float _explosionForce = 500f;
-    [SerializeField] private float _explosionRadius = 3f;
+    [SerializeField] private float _decreaseScaleCoefficient = 0.5f;
+    [SerializeField] private float _decreaseSplitChanceCoefficient = 0.5f;
 
-    public static event Action<Cube, float> BlownUp;
+    private Renderer _renderer;
 
-    private void OnEnable()
+    public event Action<Cube> BlownUp;
+
+    public Renderer Renderer => _renderer;
+
+    private void Awake()
     {
-        _raycastHitter.TargetHitted += BlowUp;
+        _renderer = GetComponent<Renderer>();
     }
 
-    private void OnDisable()
+    public void TakeDamage()
     {
-        _raycastHitter.TargetHitted -= BlowUp;
-    }
-
-    public void BlowUp(Cube cube)
-    {
-        if (cube == this)
+        if (_chanceToSplit >= Random.Range(0, 101))
         {
-            BlownUp?.Invoke(this, _chanceToSplit);
-            Explode();
-            Destroy(gameObject);
+            BlownUp?.Invoke(this);
         }
+
+        Destroy(gameObject);
     }
 
     public void Decrease()
     {
-        transform.localScale *= 0.5f;
-        _chanceToSplit *= 0.5f;
+        transform.localScale *= _decreaseScaleCoefficient;
+        _chanceToSplit *= _decreaseSplitChanceCoefficient;
     }
 
-    private void Explode()
+    public void Recolor()
     {
-        Collider[] colliders = Physics.OverlapSphere(transform.position, _explosionRadius);
-
-        foreach (Collider nearbyObject in colliders)
+        if (Renderer != null)
         {
-            Rigidbody rb = nearbyObject.GetComponent<Rigidbody>();
-
-            if (rb != null)
-            {
-                rb.AddExplosionForce(_explosionForce, transform.position, _explosionRadius);
-            }
+            Renderer.material.color = new Color(Random.value, Random.value, Random.value);
         }
+        else
+            Debug.Log("GAY");
     }
 }
