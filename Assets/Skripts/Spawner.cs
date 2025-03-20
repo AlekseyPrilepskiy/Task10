@@ -5,6 +5,8 @@ using UnityEngine;
 
 public class Spawner : MonoBehaviour
 {
+    [SerializeField] private int SpawnStepPositiveValue = 2;
+    [SerializeField] private int SpawnStepNegativeValue = -2;
     [SerializeField] private List<Cube> _cubes;
 
     private int _minimalCount = 2;
@@ -32,6 +34,8 @@ public class Spawner : MonoBehaviour
                 cube.BlownUp -= Spawn;
             }
         }
+
+        _cubes.Clear();
     }
 
     public void Spawn(Cube cube)
@@ -40,13 +44,16 @@ public class Spawner : MonoBehaviour
 
         for (int i = 0; i < GetRandomValue(_minimalCount, _maximalCount + 1); i++)
         {
-            Vector3 position = new Vector3(cube.transform.position.x + GetRandomValue(-1, 1), 1, cube.transform.position.z + GetRandomValue(-1, 1));
+            float positionX = cube.transform.position.x + GetRandomValue(SpawnStepNegativeValue, SpawnStepPositiveValue);
+            float positionY = 1;
+            float positionZ = cube.transform.position.z + GetRandomValue(SpawnStepNegativeValue, SpawnStepPositiveValue);
+
+            Vector3 position = new Vector3(positionX, positionY, positionZ);
 
             Cube newCube = Instantiate(cube);
 
             newCube.transform.position = position;
             newCube.Decrease();
-            newCube.Recolor();
             newCube.BlownUp += Spawn;
 
             spawnedCubes.Add(newCube);

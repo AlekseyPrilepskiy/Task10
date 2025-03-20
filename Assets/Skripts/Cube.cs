@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.UIElements;
 using Random = UnityEngine.Random;
 
+[RequireComponent(typeof(Renderer))]
 public class Cube : MonoBehaviour, IDamageable
 {
     [SerializeField] private float _chanceToSplit = 100f;
@@ -12,19 +13,25 @@ public class Cube : MonoBehaviour, IDamageable
     [SerializeField] private float _decreaseSplitChanceCoefficient = 0.5f;
 
     private Renderer _renderer;
+    private Rigidbody _rigidBody;
+
+    private int _minimalChance = 0;
+    private int _maximalChance = 100;
 
     public event Action<Cube> BlownUp;
 
     public Renderer Renderer => _renderer;
+    public Rigidbody RigidBody => _rigidBody;
 
     private void Awake()
     {
         _renderer = GetComponent<Renderer>();
+        _rigidBody = GetComponent<Rigidbody>();
     }
 
     public void TakeDamage()
     {
-        if (_chanceToSplit >= Random.Range(0, 101))
+        if (_chanceToSplit >= Random.Range(_minimalChance, _maximalChance + 1))
         {
             BlownUp?.Invoke(this);
         }
@@ -36,15 +43,5 @@ public class Cube : MonoBehaviour, IDamageable
     {
         transform.localScale *= _decreaseScaleCoefficient;
         _chanceToSplit *= _decreaseSplitChanceCoefficient;
-    }
-
-    public void Recolor()
-    {
-        if (Renderer != null)
-        {
-            Renderer.material.color = new Color(Random.value, Random.value, Random.value);
-        }
-        else
-            Debug.Log("GAY");
     }
 }

@@ -22,13 +22,14 @@ public class Explosion : MonoBehaviour
     {
         foreach (Cube cube in cubes)
         {
-            if (cube == this) continue;
-
-            Rigidbody rb = cube.GetComponent<Rigidbody>();
-
-            if (rb != null)
+            if (cube == this)
             {
-                rb.AddExplosionForce(_explosionForce, transform.position, _explosionRadius);
+                continue;
+            }
+
+            if (cube.RigidBody != null)
+            {
+                cube.RigidBody.AddExplosionForce(_explosionForce, transform.position, _explosionRadius);
             }
         }
     }

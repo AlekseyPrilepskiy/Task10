@@ -12,7 +12,6 @@ public class InputReader : MonoBehaviour
         if (Input.GetMouseButtonDown(0))
         {
             MouseButtonPressed?.Invoke();
-            Debug.Log("Клавиша нажата.");
         }
     }
 }
