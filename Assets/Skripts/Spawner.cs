@@ -20,7 +20,7 @@ public class Spawner : MonoBehaviour
         {
             if (cube != null)
             {
-                cube.BlownUp += Spawn;
+                cube.Splitted += Spawn;
             }
         }
     }
@@ -31,7 +31,7 @@ public class Spawner : MonoBehaviour
         {
             if (cube != null)
             {
-                cube.BlownUp -= Spawn;
+                cube.Splitted -= Spawn;
             }
         }
 
@@ -54,7 +54,7 @@ public class Spawner : MonoBehaviour
 
             newCube.transform.position = position;
             newCube.Decrease();
-            newCube.BlownUp += Spawn;
+            newCube.Splitted += Spawn;
 
             spawnedCubes.Add(newCube);
         }

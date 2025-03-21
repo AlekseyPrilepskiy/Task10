@@ -6,6 +6,7 @@ using UnityEngine.UIElements;
 using Random = UnityEngine.Random;
 
 [RequireComponent(typeof(Renderer))]
+[RequireComponent(typeof(Rigidbody))]
 public class Cube : MonoBehaviour, IDamageable
 {
     [SerializeField] private float _chanceToSplit = 100f;
@@ -18,7 +19,8 @@ public class Cube : MonoBehaviour, IDamageable
     private int _minimalChance = 0;
     private int _maximalChance = 100;
 
-    public event Action<Cube> BlownUp;
+    public event Action<Cube> Splitted;
+    public event Action Destroyed;
 
     public Renderer Renderer => _renderer;
     public Rigidbody RigidBody => _rigidBody;
@@ -33,7 +35,11 @@ public class Cube : MonoBehaviour, IDamageable
     {
         if (_chanceToSplit >= Random.Range(_minimalChance, _maximalChance + 1))
         {
-            BlownUp?.Invoke(this);
+            Splitted?.Invoke(this);
+        }
+        else
+        {
+            Destroyed?.Invoke();
         }
 
         Destroy(gameObject);
